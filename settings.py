@@ -10,3 +10,4 @@ class Settings():
         self.bullet_color = 60, 60, 60
         self.bullets_allowed = 6
         self.screen_width = 1200
+        self.screen_height = 700

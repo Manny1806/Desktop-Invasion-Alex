@@ -26,7 +26,7 @@ def run_game():
     # shortcut = Shortcut(ai_settings, screen)
 
     #create fleet 
-    gf.create_fleet(ai_settings, screen, shortcuts)
+    gf.create_fleet(ai_settings, screen, ship, shortcuts)
 
     while True:
         gf.check_events(ai_settings, screen, ship, bullets)

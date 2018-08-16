@@ -51,18 +51,26 @@ def get_number_shortcuts_x(ai_settings, shortcut_width):
     number_shortcuts_x = int(available_space_x / (2 * shortcut_width))
     return number_shortcuts_x
 
-def create_shortcut(ai_settings, screen, shortcuts, shortcut_number):
+def create_shortcut(ai_settings, screen, shortcuts, shortcut_number, row_number):
     shortcut = Shortcut(ai_settings, screen)
     shortcut_width = shortcut.rect.width
     shortcut.x = shortcut_width + 2 * shortcut_width * shortcut_number
     shortcut.rect.x = shortcut.x
+    shortcut.rect.y = shortcut.rect.height + 2 * shortcut.rect.height * row_number
     shortcuts.add(shortcut)
 
-def create_fleet(ai_settings, screen, shortcuts):
+def create_fleet(ai_settings, screen, ship, shortcuts):
     shortcut = Shortcut(ai_settings, screen)
     number_shortcuts_x = get_number_shortcuts_x(ai_settings, shortcut.rect.width)
-    # shortcut_width = shortcut.rect.width
+    number_rows = get_number_rows(ai_settings, ship.rect.height, shortcut.rect.height)
     
     #create first row of shortcuts
-    for shortcut_number in range(number_shortcuts_x):
-        create_shortcut(ai_settings, screen, shortcuts, shortcut_number)
+    for row_number in range(number_rows):
+        for shortcut_number in range(number_shortcuts_x):
+            create_shortcut(ai_settings, screen, shortcuts, shortcut_number, row_number)
+
+def get_number_rows(ai_settings, ship_height, shortcut_height):
+    available_space_y = (ai_settings.screen_height - (3 * shortcut_height) - ship_height)
+    number_rows = int(available_space_y / (2 * shortcut_height))
+    return number_rows
+

@@ -1,10 +1,11 @@
 import sys
 from bullet import Bullet
 from shortcut import Shortcut
+from clippy import Clippy
 from time import sleep
 import pygame
 
-def check_events(ai_settings, screen, stats, play_button, ship, bullets):
+def check_events(ai_settings, screen, stats, play_button, ship, shortcuts, bullets, pygame, clippy):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
@@ -14,11 +15,30 @@ def check_events(ai_settings, screen, stats, play_button, ship, bullets):
             check_keyup_events(event, ship)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(stats, play_button, mouse_x, mouse_y)
+            check_play_button(ai_settings, screen, stats, play_button, ship, shortcuts, bullets, mouse_x, mouse_y, pygame, clippy)
             
-def check_play_button(stats, play_button, mouse_x, mouse_y):
-    if play_button.rect.collidepoint(mouse_x, mouse_y):
+def check_play_button(ai_settings, screen, stats, play_button, ship, shortcuts, bullets, mouse_x, mouse_y, pygame, clippy):
+    button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
+    if button_clicked and not stats.game_active:
+        ai_settings.initialize_dynamic_settings()
+
+        pygame.mouse.set_visible(False)
+
+        stats.reset_stats()
         stats.game_active = True
+
+        shortcuts.empty()
+        bullets.empty()
+
+        clippy.empty()
+        clip = Clippy(ai_settings, screen)
+        clippy.add(clip)
+
+        create_fleet(ai_settings, screen, ship, shortcuts)
+        ship.center_ship()
+
+        pygame.mixer.music.load('game.mp3')
+        pygame.mixer.music.play(-1)
         
 def check_keydown_events(event, ai_settings, screen, ship, bullets):
     if event.key == pygame.K_RIGHT:
@@ -39,27 +59,48 @@ def check_keyup_events(event, ship):
     elif event.key == pygame.K_LEFT:
         ship.moving_left = False
 
-def update_bullets(ai_settings, screen, ship, shortcuts, bullets):
+def update_bullets(ai_settings, screen, stats, sb, ship, shortcuts, bullets, clippy):
     bullets.update()
     #get rid of bullets that leave screen
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
-    check_bullet_shortcut_collisions(ai_settings, screen, ship, shortcuts, bullets)
+    check_bullet_shortcut_collisions(ai_settings, screen, stats, sb, ship, shortcuts, bullets, clippy)
 
-def check_bullet_shortcut_collisions(ai_settings, screen, ship, shortcuts, bullets):
+def check_bullet_shortcut_collisions(ai_settings, screen, stats, sb, ship, shortcuts, bullets, clippy):
     collisions = pygame.sprite.groupcollide(bullets, shortcuts, True, True)
+    collisions2 = pygame.sprite.groupcollide(bullets, clippy, True, True)
+
+    if collisions:
+        stats.score += ai_settings.shortcut_points
+        sb.prep_score()
+
+    if collisions2:
+        stats.score += ai_settings.clippy_points
+        sb.prep_score()
 
     if len(shortcuts) == 0:
+        clippy.empty()
+        clip = Clippy(ai_settings, screen)
+        clippy.add(clip)
+        ai_settings.clippy_moving = False
         bullets.empty()
+        ai_settings.increase_speed()
         create_fleet(ai_settings, screen, ship, shortcuts)
+    
+    if len(shortcuts) == 15:
+        ai_settings.clippy_moving = True
 
-def update_screen(bg, screen, stats, ship, shortcuts, bullets, play_button):
+
+
+def update_screen(bg, screen, stats, sb, ship, shortcuts, bullets, play_button, clippy):
     screen.blit(bg, (0, 0))
     for bullet in bullets.sprites():
         bullet.draw_bullet()
     ship.blitme()
     shortcuts.draw(screen)
+    clippy.draw(screen)
+    sb.show_score()
     if not stats.game_active:
         play_button.draw_button()
 
@@ -116,7 +157,10 @@ def ship_hit(ai_settings, stats, screen, ship, shortcuts, bullets):
 
         sleep(0.5)
     else:
-        stats.game_active = False   
+        stats.game_active = False
+        pygame.mouse.set_visible(True)
+        pygame.mixer.music.load('menu.mp3')
+        pygame.mixer.music.play(-1)   
 
 def update_shortcuts(ai_settings, stats, screen, ship, shortcuts, bullets):
     check_shortcuts_bottom(ai_settings, stats, screen, ship, shortcuts, bullets)
@@ -133,3 +177,8 @@ def check_shortcuts_bottom(ai_settings, stats, screen, ship, shortcuts, bullets)
         if shortcut.rect.bottom >= screen_rect.bottom:
             ship_hit(ai_settings, stats, screen, ship, shortcuts, bullets)
             break
+
+#  def activate_clippy():
+#      if state.ships_left < 10:
+
+

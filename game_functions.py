@@ -5,7 +5,7 @@ from clippy import Clippy
 from time import sleep
 import pygame
 
-def check_events(ai_settings, screen, stats, play_button, ship, shortcuts, bullets, pygame, clippy):
+def check_events(ai_settings, screen, stats, sb, play_button, ship, shortcuts, bullets, pygame, clippy):
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             sys.exit()
@@ -15,9 +15,9 @@ def check_events(ai_settings, screen, stats, play_button, ship, shortcuts, bulle
             check_keyup_events(event, ship)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(ai_settings, screen, stats, play_button, ship, shortcuts, bullets, mouse_x, mouse_y, pygame, clippy)
+            check_play_button(ai_settings, screen, stats, sb, play_button, ship, shortcuts, bullets, mouse_x, mouse_y, pygame, clippy)
             
-def check_play_button(ai_settings, screen, stats, play_button, ship, shortcuts, bullets, mouse_x, mouse_y, pygame, clippy):
+def check_play_button(ai_settings, screen, stats, sb, play_button, ship, shortcuts, bullets, mouse_x, mouse_y, pygame, clippy):
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     if button_clicked and not stats.game_active:
         ai_settings.initialize_dynamic_settings()
@@ -26,6 +26,9 @@ def check_play_button(ai_settings, screen, stats, play_button, ship, shortcuts, 
 
         stats.reset_stats()
         stats.game_active = True
+
+        sb.prep_score()
+        sb.prep_high_score()
 
         shortcuts.empty()
         bullets.empty()
@@ -72,8 +75,10 @@ def check_bullet_shortcut_collisions(ai_settings, screen, stats, sb, ship, short
     collisions2 = pygame.sprite.groupcollide(bullets, clippy, True, True)
 
     if collisions:
-        stats.score += ai_settings.shortcut_points
-        sb.prep_score()
+        for shortcuts in collisions.values():
+            stats.score += ai_settings.shortcut_points * len(shortcuts)
+            sb.prep_score()
+        check_high_score(stats, sb)
 
     if collisions2:
         stats.score += ai_settings.clippy_points
@@ -178,7 +183,9 @@ def check_shortcuts_bottom(ai_settings, stats, screen, ship, shortcuts, bullets)
             ship_hit(ai_settings, stats, screen, ship, shortcuts, bullets)
             break
 
-#  def activate_clippy():
-#      if state.ships_left < 10:
+def check_high_score(stats, sb):
+    if stats.score > stats.high_score:
+        stats.high_score = stats.score
+        sb.prep_high_score()
 
 

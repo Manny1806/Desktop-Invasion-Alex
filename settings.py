@@ -2,7 +2,7 @@ class Settings():
     def __init__(self):
         
         self.ship_speed_factor = 3.5
-        self.ship_limit = 3
+        self.ship_limit = 0
 
         #bullet-settings
         self.bullet_speed_factor = 4 

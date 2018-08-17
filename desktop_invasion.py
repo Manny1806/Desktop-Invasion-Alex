@@ -44,7 +44,7 @@ def run_game():
     
 
     while True:
-        gf.check_events(ai_settings, screen, stats, play_button, ship, shortcuts, bullets, pygame, clippy)
+        gf.check_events(ai_settings, screen, stats, sb, play_button, ship, shortcuts, bullets, pygame, clippy)
         if stats.game_active:
             ship.update()
             clippy.update(ai_settings)

@@ -29,3 +29,9 @@ Each time you win a round the movement speed of the shortcuts will increase, mak
 increasingly difficult.
 
 See how many points you can rack up before game over! 
+
+## One last thing..
+
+Watch out for clippy!!!
+
+![GameScreenshot2](https://github.com/thinkful-ei21/Desktop-Invasion-Alex/blob/master/python2.png)

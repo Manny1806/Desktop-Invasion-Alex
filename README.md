@@ -34,4 +34,4 @@ See how many points you can rack up before game over!
 
 Watch out for clippy!!!
 
-![GameScreenshot2](https://github.com/thinkful-ei21/Desktop-Invasion-Alex/blob/master/python2.png)
+![GameScreenshot2](https://github.com/thinkful-ei21/Desktop-Invasion-Alex/blob/master/python4.png)

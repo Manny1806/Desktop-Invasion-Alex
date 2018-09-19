@@ -1,5 +1,6 @@
 # Desktop-Invasion-Alex
 This is a space invaders type game I made using Python3 and Pygame
+![GameScreenshot](https://raw.githubusercontent.com/thinkful-ei21/alex-albert-spaced-repitition-client/master/src/screenshots/login-page.png)
 
 ## Description
 Your Windows 95 desktop has become overrun with old and unused desktop shortcuts!
